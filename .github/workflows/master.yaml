@@ -1,0 +1,38 @@
+name: deploy-v3.7.x
+
+on:
+  push:
+    branches: [master]
+
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+      - run: npm ci --legacy-peer-deps
+      - run: cp .env.production .env.production.local
+      - run: npm run build
+      - run: tar -czvf resurfaceio-ui.tar.gz out
+      - name: Push
+        id: push
+        uses: cloudsmith-io/action@
+        with:
+          api-key: ${{ secrets.CLOUDSMITH_API_KEY }}
+          command: "push"
+          format: "raw"
+          owner: "resurfaceio" # Your Cloudsmith account name or org name (namespace)
+          repo: "internal" # Your Cloudsmith Repository name (slug)
+          file: "resurfaceio-ui.tar.gz" # Name of file
+          name: "resurfaceio-ui.tar.gz" # Name for Raw package
+          version: 3.7.${{github.run_number}}
