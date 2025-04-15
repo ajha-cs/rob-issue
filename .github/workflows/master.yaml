@@ -17,22 +17,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "20"
-      - run: npm ci --legacy-peer-deps
-      - run: cp .env.production .env.production.local
-      - run: npm run build
-      - run: tar -czvf dummy.tar.gz dummy.txt
-      - name: Push
-        id: push
-        uses: cloudsmith-io/action@master
+#      - uses: actions/setup-node@v2
+#        with:
+#          node-version: "20"
+#      - run: npm ci --legacy-peer-deps
+#      - run: cp .env.production .env.production.local
+#      - run: npm run build
+#      - run: tar -czvf resurfaceio-ui.tar.gz out
+      - name: Install Cloudsmith CLI
+        uses: cloudsmith-io/cloudsmith-cli-action@v1.0.3
         with:
           api-key: ${{ secrets.CLOUDSMITH_API_KEY }}
-          command: "push"
-          format: "raw"
-          owner: "orgcs" # Your Cloudsmith account name or org name (namespace)
-          repo: "jenkinsrepo" # Your Cloudsmith Repository name (slug)
-          file: "dummy.tar.gz" # Name of file
-          name: "dummy.tar.gz" # Name for Raw package
-          version: 3.7.${{github.run_number}}
+#      - name: Push package to CloudSmith
+#        run: cloudsmith push raw resurfaceio/internal resurfaceio-ui.tar.gz --name='resurfaceio-ui.tar.gz' --version=3.7.${{github.run_number}}
